@@ -1,47 +1,70 @@
-debugger;
-// Create XMLHttpRequest object.
-// const proxyurl = "https://cors-anywhere.herokuapp.com/";
-// const url = "https://www.encodedna.com/library/sample.json";
-fetch('players.json')
-    .then(response => response.text())
-    .then(contents => createTableFromJSON(contents))
-    .catch((e) => console.log('error'))
+import {Player} from "./player.js";
+import {getArray} from "./service.js";
 
-// Create an HTML table using the JSON data.
-function createTableFromJSON(jsonData) {
-    var arrBirds = [];
-    arrBirds = JSON.parse(jsonData); // Convert JSON to array.
-    var col = [];
-    for (var key in arrBirds) {
-        console.log('key: ' + key);
-        if (col.indexOf(key) === -1) {
-            col.push(key);
+setDefaults();
+
+async function setDefaults() {
+    const elements = await getArray('players.json');
+    let players = [];
+    for (let i = 0; i < elements.length; i++) {
+        if (players.indexOf(i) === -1) {
+            let element = elements[i];
+            players.push(new Player(element.ID, element.FirstName, element.LastName));
         }
     }
 
-    // Create a dynamic table.
-    var table = document.createElement("table") // Create table header.
-    var tr = table.insertRow(-1); // Table row. (last position)
+    var rankingElements = await getArray('rankings.json');
+    for (let i = 0; i < rankingElements.length; i++) {
+        let playerIndex = players.findIndex(p => p.id === rankingElements[i].PlayerID);
+        if (playerIndex === undefined) {
+            console.log("Not found player " + rankingElements[i].PlayerID);
+        } else {
+            let player = players[playerIndex];
+            if (player !== undefined) {
+                console.log("Update ranking  for player " + player.id);
+                players[playerIndex].ranking = rankingElements[i].Position;
+                console.log("Updated ranking for player " + player.firstName + " " + player.lastName + " with ranking position " + player.ranking);
+            }
+        }
 
-    var th = document.createElement("th"); // Table header.
-    th.innerHTML = "Name";
-    tr.appendChild(th);
-
-    var th = document.createElement("th"); // Table header.
-    th.innerHTML = "Ranking";
-    tr.appendChild(th);
-
-    // Add JSON to the table rows.
-    for (var i = 0; i < arrBirds.length; i++) {
-        let tr = table.insertRow(-1);
-        var tabCell = tr.insertCell(-1);
-        tabCell.innerHTML = arrBirds[i].FirstName;
-        var tabCell = tr.insertCell(-1);
-        tabCell.innerHTML = arrBirds[i].LastName;
     }
 
-    // Finally, add the dynamic table to a container.
-    var divContainer = document.getElementById("ranking-table");
-    divContainer.innerHTML = "";
-    divContainer.appendChild(table);
+    chrome.storage.sync.set({
+        players: players
+    }, async function () {
+    });
 }
+
+// Create Ranking Table.
+async function createRankingTable() {
+    chrome.storage.sync.get(['players'], function (result) {
+        const players = result.players.sort((a, b) => a.ranking > b.ranking ? 1 : -1);
+
+        var table = document.createElement("table") // Create table header.
+        var tr = table.insertRow(-1); // Table row. (last position)
+
+        // Add JSON to the table rows.
+        for (var i = 0; i < players.length; i++) {
+            let tr = table.insertRow(-1);
+            let tabCell1 = tr.insertCell(-1);
+            tabCell1.innerHTML = players[i].ranking;
+            let tabCell2 = tr.insertCell(-1);
+            tabCell2.innerHTML = players[i].firstName + " " + players[i].lastName;
+        }
+
+        // Finally, add the dynamic table to a container.
+        var divContainer = document.getElementById("content");
+        divContainer.innerHTML = "";
+        divContainer.appendChild(table);
+    });
+}
+
+async function createContent() {
+    var divContainer = document.getElementById("content");
+    divContainer.innerHTML = "";
+}
+
+document.getElementById("radio1").addEventListener('click', createContent);
+document.getElementById("radio2").addEventListener('click', createContent);
+document.getElementById("radio3").addEventListener('click', createRankingTable);
+document.getElementById("radio4").addEventListener('click', createContent);
