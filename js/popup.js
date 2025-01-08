@@ -23,13 +23,14 @@ async function setDefaults() {
             if (player !== undefined) {
                 console.log("Update ranking  for player " + player.id);
                 players[playerIndex].ranking = rankingElements[i].Position;
+                players[playerIndex].money = rankingElements[i].Sum;
                 console.log("Updated ranking for player " + player.firstName + " " + player.lastName + " with ranking position " + player.ranking);
             }
         }
 
     }
 
-    chrome.storage.sync.set({
+    chrome.storage.local.set({
         players: players
     }, async function () {
     });
@@ -37,7 +38,7 @@ async function setDefaults() {
 
 // Create Ranking Table.
 async function createRankingTable() {
-    chrome.storage.sync.get(['players'], function (result) {
+    chrome.storage.local.get(['players'], function (result) {
         const players = result.players.sort((a, b) => a.ranking > b.ranking ? 1 : -1);
 
         var table = document.createElement("table") // Create table header.
@@ -50,6 +51,8 @@ async function createRankingTable() {
             tabCell1.innerHTML = players[i].ranking;
             let tabCell2 = tr.insertCell(-1);
             tabCell2.innerHTML = players[i].firstName + " " + players[i].lastName;
+            let tabCell3 = tr.insertCell(-1);
+            tabCell3.innerHTML = players[i].money;
         }
 
         // Finally, add the dynamic table to a container.

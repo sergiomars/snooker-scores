@@ -3,6 +3,7 @@ export class Player {
     firstName;
     lastName;
     ranking;
+    money;
 
     constructor(id, firstName, lastName) {
         this.id = id;

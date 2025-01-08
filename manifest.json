@@ -11,6 +11,7 @@
     "open_in_tab": true
   },
   "permissions": [
-    "storage"
+    "storage",
+    "unlimitedStorage"
   ]
 }
