@@ -1,12 +1,25 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Snooker Scores Options</title>
-        <link rel="stylesheet" href="./css/options.css">
-    </head>
-    <body>
-        <div id="frame">
-            <h1>Snooker Scores Options</h1>
-        </div>
-    </body>
+<head>
+    <title>Snooker Scores Options</title>
+    <link rel="stylesheet" href="resources/css/options.css">
+</head>
+<body>
+<div id="frame">
+    <h1>Snooker Scores Options</h1>
+
+    <section>
+        <label for="season">Season</label>
+        <select id="season"></select>
+        <p class="hint">Season runs June → May. Events and rankings come from api.snooker.org.</p>
+    </section>
+
+    <section>
+        <button id="clear">Clear cache</button>
+        <span id="status"></span>
+        <p class="hint">Live data is cached for 5 minutes per request.</p>
+    </section>
+</div>
+<script type="module" src="js/options.js"></script>
+</body>
 </html>

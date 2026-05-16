@@ -2,16 +2,16 @@
   "name": "Snooker Scores",
   "description": "A chrome extension to view snooker scores.",
   "manifest_version": 3,
-  "version": "0.0.1",
+  "version": "0.1.0",
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": { "48": "resources/icon.png", "128": "resources/icon.png" }
   },
+  "icons": { "48": "resources/icon.png", "128": "resources/icon.png" },
   "options_ui": {
     "page": "options.html",
     "open_in_tab": true
   },
-  "permissions": [
-    "storage",
-    "unlimitedStorage"
-  ]
+  "permissions": ["storage", "unlimitedStorage"],
+  "host_permissions": ["https://proxy.snooker-scores.workers.dev/*"]
 }
