@@ -228,10 +228,23 @@ table.data .num { text-align: right; color: #B1A7A0; font-variant-numeric: tabul
     border-radius: 3px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .pmatch-row .sc.win { color: #6FCF97; }
 .pmatch-row .sc.lose { color: #B1A7A0; }
+.pmatch.clickable { cursor: pointer; }
+.pmatch.clickable:hover { border-color: #EB4E01; }
 
 /* --- Profile --- */
 .profile-head { padding-bottom: 8px; border-bottom: 1px solid #575654; margin-bottom: 8px; }
 .profile-head h2 { font-size: 16px; margin: 0 0 4px; color: #EB4E01; }
+
+/* Footer */
+#footer {
+    text-align: center;
+    font-size: 10px;
+    color: #B1A7A0;
+    padding: 6px 8px;
+    background: #2B2A28;
+    border-top: 1px solid #575654;
+}
+#footer a { color: #F29A77; text-decoration: none; }
 
 /* Scrollbar */
 #content::-webkit-scrollbar { width: 6px; }

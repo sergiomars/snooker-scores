@@ -2,7 +2,7 @@
   "name": "Snooker Scores",
   "description": "A chrome extension to view snooker scores.",
   "manifest_version": 3,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "action": {
     "default_popup": "popup.html",
     "default_icon": { "48": "resources/icon.png", "128": "resources/icon.png" }

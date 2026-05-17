@@ -38,7 +38,6 @@ let state = { season: currentSeason(), players: [], events: [], rankings: [] };
 async function loadAll() {
     const s = await getSettings();
     state.season = s.season || currentSeason();
-    console.log("Loaded season: " + state.season);
     const [rawPlayers, rawEvents, rawRank] = await Promise.all([
         fetchPlayers(state.season),
         fetchEvents(state.season),
@@ -167,6 +166,14 @@ async function renderMatchDetail(eventId, matchId, back) {
         content().innerHTML = "";
         content().append(el("button", { class: "back-btn", onclick: back }, "← Back"));
         if (evt) content().append(el("div", { class: "evt-meta" }, evt.name));
+
+        const roundLabels = ["Final", "Semi-Finals", "Quarter-Finals", "Last 16", "Last 32", "Last 64", "Last 128"];
+        const roundsDesc = [...new Set(matches.map(x => x.Round))].sort((a, b) => b - a);
+        const rIdx = roundsDesc.indexOf(m.Round);
+        const roundName = rIdx >= 0 ? (roundLabels[rIdx] || ("Round " + m.Round)) : ("Round " + m.Round);
+        const matchDate = m.ScheduledDate || m.StartDate || m.EndDate;
+        const metaBits = [roundName, matchDate ? fmtDate(matchDate) : null].filter(Boolean).join(" · ");
+        if (metaBits) content().append(el("div", { class: "evt-meta" }, metaBits));
 
         content().append(el("div", { class: "match" }, [
             el("span", { class: "pn " + (m.WinnerID === m.Player1ID ? "win" : "") }, n1),
@@ -362,8 +369,13 @@ async function renderProfile(playerId) {
         }
         const byId = new Map(state.players.map(x => [x.id, x]));
         const eventsById = new Map(state.events.map(e => [e.id, e]));
+        const sorted = matches.slice().sort((a, b) => {
+            const da = new Date(a.ScheduledDate || a.StartDate || a.EndDate || 0).getTime();
+            const db = new Date(b.ScheduledDate || b.StartDate || b.EndDate || 0).getTime();
+            return db - da;
+        });
         content().append(el("div", { class: "round-h" }, "Recent matches"));
-        matches.slice(0, 20).forEach(m => {
+        sorted.slice(0, 30).forEach(m => {
             const oppId = m.Player1ID === pid ? m.Player2ID : m.Player1ID;
             const opp = byId.get(oppId);
             const oppName = opp ? `${opp.firstName} ${opp.lastName}` : ("Player " + oppId);
@@ -372,7 +384,7 @@ async function renderProfile(playerId) {
             const won = m.WinnerID === pid;
             const evt = eventsById.get(m.EventID);
             const meta = evt ? `${evt.name}${evt.city ? " · " + evt.city : ""}` : "";
-            const row = el("div", { class: "pmatch" }, [
+            const row = el("div", { class: "pmatch clickable", onclick: () => renderMatchDetail(m.EventID, m.ID, () => renderProfile(pid)) }, [
                 meta ? el("div", { class: "pmatch-meta" }, meta) : null,
                 el("div", { class: "pmatch-row" }, [
                     el("span", { class: "pn" }, "vs " + oppName),
