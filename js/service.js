@@ -32,17 +32,28 @@ export async function clearCache() {
 }
 
 async function cachedFetch(params) {
-    const url = API + "?" + new URLSearchParams(params).toString();
-    console.log("Url to fetch: " + url);
+    const url = API + "?" + new URLSearchParams(params);
     const key = CACHE_PREFIX + url;
-    const cached = await getStorage([key]);
-    const hit = cached[key];
-    if (hit && Date.now() - hit.t < TTL_MS) return hit.v;
+    const hit = (await getStorage([key]))[key];
+
+    if (hit && Date.now() - hit.t < TTL_MS)
+        return hit.v;
+
     const res = await fetch(url);
-    if (!res.ok) throw new Error("API " + res.status);
-    const v = await res.json();
-    await setStorage({ [key]: { t: Date.now(), v } });
-    return v;
+    const text = await res.text();
+
+    if (!res.ok) {
+        console.error("API ERROR", url, text);
+        throw new Error(`API ${res.status}`);
+    }
+
+    const value = JSON.parse(text);
+
+    await setStorage({
+        [key]: { t: Date.now(), v: value }
+    });
+
+    return value;
 }
 
 // Kept for backwards compatibility with the existing Jest test.
