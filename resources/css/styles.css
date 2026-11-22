@@ -2,6 +2,7 @@
 
 body {
     width: 405px;
+    min-height: 620px;
     background: #B1A7A0;
     color: #FCF9F4;
     font-family: "Open Sans", "Arial";
